@@ -1,4 +1,5 @@
 import bpy
+import mathutils
 import io_scene_xray
 import tests
 
@@ -54,6 +55,34 @@ class TestAddon(tests.utils.XRayTestCase):
                 'io_scene_xray.no_such_operator'
             )
         )
+
+    def test_matrix_inverted(self):
+        # Blender 5.2 removed the fallback argument of Matrix.inverted(),
+        # it raises ValueError for non invertible matrices
+        matrix = mathutils.Matrix.Identity(4)
+        self.assertEqual(matrix, utils.version.matrix_inverted(matrix))
+
+        singular = mathutils.Matrix.Diagonal((0.0, 1.0, 1.0, 1.0))
+        self.assertIsNone(utils.version.matrix_inverted(singular))
+        self.assertEqual(5, utils.version.matrix_inverted(singular, 5))
+
+    def test_make_annotations_with_non_dict_annotations(self):
+        if bpy.app.version < (2, 80):
+            self.skipTest('class fields are not converted to annotations '
+                          'before Blender 2.80')
+
+        # a class can have a property or a descriptor named __annotations__
+        # instead of a dictionary, it must not raise
+        class XRAY_TestPropertyGroup(bpy.types.PropertyGroup):
+            __annotations__ = 'not a dictionary'
+            prop = bpy.props.IntProperty()
+
+        utils.version._make_annotations(XRAY_TestPropertyGroup)
+
+        annotations = XRAY_TestPropertyGroup.__dict__['__annotations__']
+        self.assertIsInstance(annotations, dict)
+        self.assertIn('prop', annotations)
+        self.assertNotIn('prop', XRAY_TestPropertyGroup.__dict__)
 
     def test_register_class_twice(self):
         # repeated registration of the same class must not raise

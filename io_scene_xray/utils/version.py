@@ -194,6 +194,27 @@ def layout_split(layout, percentage, align=False):
     return split
 
 
+def _class_annotations(cls):
+    """Get the annotations dictionary of the class, create it if needed.
+
+    The dictionary of the class itself is returned (not the inherited
+    one), because it is modified in place. `None` is returned if the
+    annotations can not be accessed as a dictionary. For example, a
+    class can have a property or a descriptor with such name instead of
+    a dictionary.
+    """
+    annotations = cls.__dict__.get('__annotations__')
+
+    if not isinstance(annotations, dict):
+        annotations = {}
+        try:
+            setattr(cls, '__annotations__', annotations)
+        except (AttributeError, TypeError):
+            return None
+
+    return annotations
+
+
 def _make_annotations(cls):
     """Converts class fields to annotations if running with Blender 2.8"""
     if bpy.app.version < (2, 80):
@@ -215,16 +236,27 @@ def _make_annotations(cls):
 
     if bl_props:
 
-        if '__annotations__' not in cls.__dict__:
-            setattr(cls, '__annotations__', {})
+        annotations = _class_annotations(cls)
 
-        annotations = cls.__dict__['__annotations__']
-
-        for key, value in bl_props.items():
-            annotations[key] = value
-            delattr(cls, key)
+        if annotations is not None:
+            for key, value in bl_props.items():
+                annotations[key] = value
+                delattr(cls, key)
 
     return cls
+
+
+def matrix_inverted(matrix, fallback=None):
+    """Invert the matrix, return the fallback for non invertible matrices.
+
+    Blender 5.2 removed the fallback argument of `Matrix.inverted()`:
+    it raises `ValueError` for non invertible matrices, while the
+    previous versions returned the fallback value.
+    """
+    try:
+        return matrix.inverted()
+    except ValueError:
+        return fallback
 
 
 def is_registered(clas):
