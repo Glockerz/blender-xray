@@ -88,18 +88,22 @@ def _bake_to_action(obj, action, frame_start, frame_end):
         # create f-curves
         group_name = 'LocRot'
         fcurves_loc = [
-            action.fcurves.new(
+            utils.version.new_action_fcurve(
+                action,
                 'location',
                 index=axis,
-                action_group=group_name
+                action_group=group_name,
+                id_owner=obj
             )
             for axis in range(3)
         ]
         fcurves_rot = [
-            action.fcurves.new(
+            utils.version.new_action_fcurve(
+                action,
                 'rotation_euler',
                 index=axis,
-                action_group=group_name
+                action_group=group_name,
+                id_owner=obj
             )
             for axis in range(3)
         ]
@@ -149,7 +153,7 @@ def _export_action_data(packed_writer, ver, xray, act):
     loc_axes = []
     rot_axes = []
 
-    for fcurve in act.fcurves:
+    for fcurve in utils.version.get_action_fcurves(act):
         if fcurve.data_path == 'location':
             loc_axes.append(fcurve.array_index)
 
@@ -175,7 +179,9 @@ def _export_action_data(packed_writer, ver, xray, act):
 
     # export
     for curve_index in range(6):
-        fcurve = act.fcurves[(0, 2, 1, 5, 3, 4)[curve_index]]
+        fcurve = utils.version.get_action_fcurves(act)[
+            (0, 2, 1, 5, 3, 4)[curve_index]
+        ]
         coef = (1, 1, 1, -1, -1, -1)[curve_index]
 
         epsilon = motions.const.EPSILON

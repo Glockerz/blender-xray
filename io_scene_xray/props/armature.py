@@ -143,7 +143,7 @@ class XRayArmatureProps(bpy.types.PropertyGroup):
             active = bpy.context.active_bone
             if active and active.id_data == obj.data and active.name == bone.name:
                 self.state = 'active'
-            elif bone.select:
+            elif utils.bone.is_bone_selected(obj, bone):
                 self.state = 'sel'
             else:
                 self.state = 'desel'
@@ -210,7 +210,7 @@ class XRayArmatureProps(bpy.types.PropertyGroup):
             is_active = False
 
         has_limits = bone.xray.ikjoint.type in {'2', '3', '5'}
-        if is_active and has_limits and bone.select:
+        if is_active and has_limits and utils.bone.is_bone_selected(obj, bone):
 
             arm_xray = obj.data.xray
 

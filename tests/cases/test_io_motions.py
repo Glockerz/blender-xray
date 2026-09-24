@@ -1,6 +1,7 @@
 from tests import utils
 
 import bpy
+import io_scene_xray
 
 
 class TestIOMotions(utils.XRayTestCase):
@@ -22,7 +23,9 @@ class TestIOMotions(utils.XRayTestCase):
             files=[{'name': 'test.object'}],
         )
         imp_act = bpy.data.actions[1]
-        self.assertEqual(len(imp_act.fcurves[0].keyframe_points), 5)  # for now
+        fcurves = io_scene_xray.utils.version.get_action_fcurves(imp_act)
+        # for now
+        self.assertEqual(len(fcurves[0].keyframe_points), 5)
         self.assertEqual(imp_act.frame_range[1], 4)
 
     def test_io_baked(self):
@@ -44,7 +47,8 @@ class TestIOMotions(utils.XRayTestCase):
             files=[{'name': 'test.object'}],
         )
         imp_act = bpy.data.actions[1]
-        self.assertEqual(len(imp_act.fcurves[0].keyframe_points), 5)
+        fcurves = io_scene_xray.utils.version.get_action_fcurves(imp_act)
+        self.assertEqual(len(fcurves[0].keyframe_points), 5)
         self.assertEqual(imp_act.frame_range[1], 4)
 
 

@@ -1,4 +1,5 @@
 import bpy
+import io_scene_xray
 import bmesh
 
 import tests
@@ -31,7 +32,9 @@ class TestRig(tests.utils.XRayTestCase):
 
         bpy.ops.object.mode_set(mode='POSE')
         bpy.ops.pose.select_all(action='DESELECT')
-        ik_obj.pose.bones['foot_l c'].bone.select = True
+        io_scene_xray.utils.bone.set_bone_selected(
+            ik_obj, ik_obj.data.bones['foot_l c'], True
+        )
 
         bpy.ops.io_scene_xray.create_ik()
 
@@ -46,7 +49,9 @@ class TestRig(tests.utils.XRayTestCase):
 
         bpy.ops.object.mode_set(mode='POSE')
         bpy.ops.pose.select_all(action='DESELECT')
-        ik_obj.pose.bones['knee_l c'].bone.select = True
+        io_scene_xray.utils.bone.set_bone_selected(
+            ik_obj, ik_obj.data.bones['knee_l c'], True
+        )
 
         bpy.ops.io_scene_xray.create_ik()
 

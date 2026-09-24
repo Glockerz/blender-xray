@@ -17,6 +17,38 @@ def is_exportable_bone(bpy_bone):
     return bpy_bone.xray.exportable
 
 
+def set_bone_selected(bpy_arm_obj, bpy_bone, select_state):
+    # Blender 5.0 removed the 'select' property of data-bones
+    if hasattr(bpy_bone, 'select'):
+        bpy_bone.select = select_state
+        return
+
+    if bpy_arm_obj.mode == 'EDIT':
+        edit_bone = bpy_arm_obj.data.edit_bones.get(bpy_bone.name)
+
+        if edit_bone is not None:
+            edit_bone.select = select_state
+            return
+
+    pose_bone = bpy_arm_obj.pose.bones.get(bpy_bone.name)
+
+    if pose_bone is not None:
+        pose_bone.select = select_state
+
+
+def is_bone_selected(bpy_arm_obj, bpy_bone):
+    # Blender 5.0 removed the 'select' property of data-bones
+    if hasattr(bpy_bone, 'select'):
+        return bpy_bone.select
+
+    pose_bone = bpy_arm_obj.pose.bones.get(bpy_bone.name)
+
+    if pose_bone is None:
+        return False
+
+    return pose_bone.select
+
+
 def find_bone_exportable_parent(bpy_bone):
     result = bpy_bone.parent
     while (result is not None) and not is_exportable_bone(result):

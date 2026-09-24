@@ -27,7 +27,7 @@ def export_motion_marks(arm, action, writer, frame_start, frame_end, fps):
     if m_bone:
         fcurves = {
             fcurve.data_path: fcurve
-            for fcurve in action.fcurves
+            for fcurve in utils.version.get_action_fcurves(action)
         }
         proccessed = set()
         for mark_item in xray.marks_collection:

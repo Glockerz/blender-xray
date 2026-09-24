@@ -1,6 +1,7 @@
 import re
 
 import bpy
+import io_scene_xray
 
 from tests import utils
 from io_scene_xray.formats.skl.ops import XRAY_OT_import_skls
@@ -35,7 +36,8 @@ class TestSklImport(utils.XRayTestCase):
         self.assertReportsNotContains('ERROR')
         self.assertEqual(len(bpy.data.actions), 1)
         act = bpy.data.actions['test_fmt']
-        self.assertEqual(len(act.fcurves[0].keyframe_points), 3)
+        fcurves = io_scene_xray.utils.version.get_action_fcurves(act)
+        self.assertEqual(len(fcurves[0].keyframe_points), 3)
 
     def test_skls(self):
         # Arrange
@@ -52,7 +54,8 @@ class TestSklImport(utils.XRayTestCase):
         self.assertReportsNotContains('ERROR')
         self.assertEqual(len(bpy.data.actions), 1)
         act = bpy.data.actions['xact']
-        self.assertEqual(len(act.fcurves[0].keyframe_points), 3)
+        fcurves = io_scene_xray.utils.version.get_action_fcurves(act)
+        self.assertEqual(len(fcurves[0].keyframe_points), 3)
         self.assertEqual(motions, ['xact'])
 
     def test_skl_filter(self):

@@ -1,5 +1,6 @@
 import re
 import bpy
+from io_scene_xray import utils
 import tests
 
 
@@ -19,7 +20,8 @@ class TestAnmImport(tests.utils.XRayTestCase):
         # Assert
         self.assertReportsNotContains('WARNING')
         self.assertEqual(obj_camera.type, 'CAMERA')
-        self.assertEqual(len(act.fcurves[0].keyframe_points), 3)
+        fcurves = utils.version.get_action_fcurves(act)
+        self.assertEqual(len(fcurves[0].keyframe_points), 3)
 
     def test_v3(self):
         # Act
@@ -141,7 +143,8 @@ class TestAnmImport(tests.utils.XRayTestCase):
 
         # Assert
         for curve_index in range(6):
-            keyframes = act.fcurves[curve_index].keyframe_points
+            fcurves = utils.version.get_action_fcurves(act)
+            keyframes = fcurves[curve_index].keyframe_points
             self.assertEqual(len(keyframes), 3)
 
             for key in keyframes:

@@ -54,6 +54,10 @@ def is_blender_44():
     return bpy.app.version >= (4, 4, 0)
 
 
+def is_blender_5():
+    return bpy.app.version >= (5, 0, 0)
+
+
 def support_principled_shader():
     return bpy.app.version >= (2, 79, 0)
 
@@ -101,6 +105,7 @@ IS_34 = is_blender_34()
 IS_4 = is_blender_4()
 IS_41 = is_blender_41()
 IS_44 = is_blender_44()
+IS_5 = is_blender_5()
 
 
 def get_import_export_menus():
@@ -338,6 +343,138 @@ def remove_handler(handlers, handler):
     # list.remove raises ValueError, if the handler is not in the list
     if handler in handlers:
         handlers.remove(handler)
+
+
+# Blender 5.0 stores f-curves of an action in channelbags
+# (action.layers[].strips[].channelbags[].fcurves) instead of
+# the action.fcurves collection
+
+def has_action_fcurves(action):
+    return hasattr(action, 'fcurves')
+
+
+def get_action_fcurves(action):
+    # list of all f-curves of the action
+    if has_action_fcurves(action):
+        return list(action.fcurves)
+
+    fcurves = []
+
+    for layer in action.layers:
+        for strip in layer.strips:
+            for channelbag in strip.channelbags:
+                fcurves.extend(channelbag.fcurves)
+
+    return fcurves
+
+
+def _get_action_channelbag(action, id_owner=None):
+    slot = None
+
+    if id_owner is not None:
+        animation_data = id_owner.animation_data
+
+        if animation_data and animation_data.action == action:
+            slot = animation_data.action_slot
+
+            if slot is not None:
+                for layer in action.layers:
+                    for strip in layer.strips:
+                        channelbag = strip.channelbag(slot)
+
+                        if channelbag is not None:
+                            return channelbag
+
+    if slot is None:
+        if len(action.slots):
+            slot = action.slots[0]
+        else:
+            name = id_owner.name if id_owner is not None else ''
+            slot = action.slots.new(id_type='OBJECT', name=name)
+
+    if len(action.layers):
+        layer = action.layers[0]
+    else:
+        layer = action.layers.new('Layer')
+
+    if len(layer.strips):
+        strip = layer.strips[0]
+    else:
+        strip = layer.strips.new(type='KEYFRAME')
+
+    channelbag = strip.channelbag(slot)
+
+    if channelbag is None:
+        channelbag = strip.channelbags.new(slot)
+
+    return channelbag
+
+
+def new_action_fcurve(
+        action,
+        data_path,
+        index=0,
+        action_group=None,
+        id_owner=None
+    ):
+
+    if has_action_fcurves(action):
+        # action_group can not be None
+        if action_group:
+            return action.fcurves.new(
+                data_path,
+                index=index,
+                action_group=action_group
+            )
+
+        return action.fcurves.new(data_path, index=index)
+
+    if id_owner is not None:
+        animation_data = id_owner.animation_data
+
+        if animation_data and animation_data.action == action:
+            # creates the action slot, the layer and the strip,
+            # if they are not created yet
+            return action.fcurve_ensure_for_datablock(
+                id_owner,
+                data_path,
+                index=index,
+                group_name=action_group if action_group else ''
+            )
+
+    channelbag = _get_action_channelbag(action, id_owner)
+
+    group = None
+
+    if action_group:
+        group = channelbag.groups.get(action_group)
+
+        if group is None:
+            group = channelbag.groups.new(action_group)
+
+    fcurve = channelbag.fcurves.new(data_path, index=index)
+
+    if group is not None:
+        fcurve.group = group
+
+    return fcurve
+
+
+def remove_action_fcurves(action, fcurves):
+    if has_action_fcurves(action):
+        for fcurve in tuple(fcurves):
+            action.fcurves.remove(fcurve)
+
+        return
+
+    for fcurve in tuple(fcurves):
+        for layer in action.layers:
+            for strip in layer.strips:
+                for channelbag in strip.channelbags:
+                    for channel_fcurve in channelbag.fcurves:
+                        if channel_fcurve == fcurve:
+                            channelbag.fcurves.remove(fcurve)
+                            break
 
 
 IMAGE_NODES = ('TEX_IMAGE', 'TEX_ENVIRONMENT')

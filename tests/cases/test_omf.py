@@ -1,4 +1,5 @@
 import bpy
+from io_scene_xray import utils
 import tests
 import io_scene_xray
 
@@ -125,13 +126,17 @@ class TestOmf(tests.utils.XRayTestCase):
             for bone_name in ('bone_0', 'bone_1'):
 
                 for curve_index in range(3):
-                    fcurve_loc = act.fcurves.new(
+                    fcurve_loc = utils.version.new_action_fcurve(
+                        act,
                         'pose.bones["{}"].location'.format(bone_name),
-                        index=curve_index
+                        index=curve_index,
+                        id_owner=obj
                     )
-                    fcurve_rot = act.fcurves.new(
+                    fcurve_rot = utils.version.new_action_fcurve(
+                        act,
                         'pose.bones["{}"].rotation_euler'.format(bone_name),
-                        index=curve_index
+                        index=curve_index,
+                        id_owner=obj
                     )
 
                     for frame, value in zip((0, 10), (0, 1)):

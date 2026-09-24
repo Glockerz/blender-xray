@@ -1,5 +1,6 @@
 import re
 import bpy
+from io_scene_xray import utils
 import tests
 
 
@@ -191,17 +192,23 @@ class TestAnmExport(tests.utils.XRayTestCase):
 
         for axis_index in range(3):
             if loc:
-                fcurve = act.fcurves.new('location', index=axis_index)
+                fcurve = utils.version.new_action_fcurve(
+                    act, 'location', index=axis_index, id_owner=obj
+                )
                 fcurve.keyframe_points.insert(0, 0)
                 fcurve.keyframe_points.insert(10, 1)
 
             if rot:
-                fcurve = act.fcurves.new('rotation_euler', index=axis_index)
+                fcurve = utils.version.new_action_fcurve(
+                    act, 'rotation_euler', index=axis_index, id_owner=obj
+                )
                 fcurve.keyframe_points.insert(0, 0)
                 fcurve.keyframe_points.insert(10, 1)
 
             if col:
-                fcurve = act.fcurves.new('color', index=axis_index)
+                fcurve = utils.version.new_action_fcurve(
+                    act, 'color', index=axis_index, id_owner=obj
+                )
                 fcurve.keyframe_points.insert(1, 0)
                 fcurve.keyframe_points.insert(10, 1)
 

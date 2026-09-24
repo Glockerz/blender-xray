@@ -1,6 +1,7 @@
 import re
 import os
 import bpy
+from io_scene_xray import utils
 import tests
 import io_scene_xray
 
@@ -232,8 +233,14 @@ class TestOgfExport(tests.utils.XRayTestCase):
         motion.name = act.name
 
         for i in range(3):
-            loc = act.fcurves.new('pose.bones["test_bone"].location', index=i)
-            rot = act.fcurves.new('pose.bones["test_bone"].rotation_euler', index=i)
+            loc = utils.version.new_action_fcurve(
+                act, 'pose.bones["test_bone"].location', index=i, id_owner=obj
+            )
+            rot = utils.version.new_action_fcurve(
+                act,
+                'pose.bones["test_bone"].rotation_euler',
+                index=i, id_owner=obj
+            )
             for i in range(2):
                 loc.keyframe_points.insert(i*5, i*1)
                 rot.keyframe_points.insert(i*5, i*0.1)

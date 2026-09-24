@@ -1,6 +1,7 @@
 import tests
 import os
 import bpy
+from io_scene_xray import utils
 import io_scene_xray
 import re
 
@@ -68,7 +69,7 @@ class TestMotionMarks(tests.utils.XRayTestCase):
 
             for mark_name in mark_names:
                 has_mark_fcurve = False
-                for fcurve in act.fcurves:
+                for fcurve in utils.version.get_action_fcurves(act):
                     data_path = 'pose.bones["root_bone"]["{}"]'.format(mark_name)
                     if fcurve.data_path == data_path:
                         has_mark_fcurve = True
@@ -96,10 +97,12 @@ def _create_export_data():
         data_path = 'pose.bones["{}"]'.format(bone.name)
         for curve_name in ('location', 'rotation_euler'):
             for channel in range(3):
-                fcurve = act.fcurves.new(
+                fcurve = utils.version.new_action_fcurve(
+                    act,
                     '{0}.{1}'.format(data_path, curve_name),
+                    index=channel,
                     action_group=bone.name,
-                    index=channel
+                    id_owner=obj
                 )
                 keyframes = fcurve.keyframe_points
                 keyframes.add(count=2)
@@ -116,9 +119,11 @@ def _create_export_data():
     mark_item = xray.marks_collection.add().mark = 'Right'
     data_path = 'pose.bones["{}"]'.format(bone.name)
     for mark_name in ('Left', 'Right'):
-        fcurve = act.fcurves.new(
+        fcurve = utils.version.new_action_fcurve(
+            act,
             '{0}["{1}"]'.format(data_path, mark_name),
-            action_group=bone.name
+            action_group=bone.name,
+            id_owner=obj
         )
         keyframes = fcurve.keyframe_points
         keyframes.add(count=3)

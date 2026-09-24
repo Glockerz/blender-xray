@@ -197,19 +197,23 @@ def read_motion(
 
             translate_fcurves = []
             for translate_index in range(3):    # x, y, z
-                translate_fcurve = act.fcurves.new(
+                translate_fcurve = utils.version.new_action_fcurve(
+                    act,
                     'pose.bones["{}"].location'.format(bone_name),
                     index=translate_index,
-                    action_group=bone_name
+                    action_group=bone_name,
+                    id_owner=context.bpy_arm_obj
                 )
                 translate_fcurves.append(translate_fcurve)
 
             rotate_fcurves = []
             for rotate_index in range(3):    # x, y, z
-                rotate_fcurve = act.fcurves.new(
+                rotate_fcurve = utils.version.new_action_fcurve(
+                    act,
                     'pose.bones["{}"].rotation_euler'.format(bone_name),
                     index=rotate_index,
-                    action_group=bone_name
+                    action_group=bone_name,
+                    id_owner=context.bpy_arm_obj
                 )
                 rotate_fcurves.append(rotate_fcurve)
 

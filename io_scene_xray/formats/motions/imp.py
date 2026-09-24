@@ -41,9 +41,11 @@ def import_motion_marks(bpy_armature, act, reader, fps, start_frame):
 
             # import intervals
             keyframes = []
-            fcurve = act.fcurves.new(
+            fcurve = utils.version.new_action_fcurve(
+                act,
                 '{0}["{1}"]'.format(data_path, mark_name),
-                action_group=m_bone.name
+                action_group=m_bone.name,
+                id_owner=bpy_armature
             )
             keyframes.extend((start_frame / fps, 0.0))
             for interval_index in range(interval_count):
@@ -219,7 +221,8 @@ def import_motion(
         used_times = set()
         if not has_interpolate:
             tmpfc = [
-                act.fcurves.new('temp', index=curve_index)
+                utils.version.new_action_fcurve(
+                    act, 'temp', index=curve_index, id_owner=bpy_armature)
                 for curve_index in range(const.CURVE_COUNT)
             ]
             frames = [[], [], [], [], [], []]
@@ -245,8 +248,7 @@ def import_motion(
                     if bname not in reported:
                         log.warn(text.warn.motion_no_bone, bone=bname)
                         reported.add(bname)
-                    for fcurve in tmpfc:
-                        act.fcurves.remove(fcurve)
+                    utils.version.remove_action_fcurves(act, tmpfc)
                     continue
             if bname not in reported:
                 log.warn(
@@ -276,12 +278,24 @@ def import_motion(
         loc_path = data_path + '.location'
         rot_path = data_path + '.rotation_euler'
         fcs = [
-            act.fcurves.new(loc_path, index=0, action_group=bname),
-            act.fcurves.new(loc_path, index=1, action_group=bname),
-            act.fcurves.new(loc_path, index=2, action_group=bname),
-            act.fcurves.new(rot_path, index=0, action_group=bname),
-            act.fcurves.new(rot_path, index=1, action_group=bname),
-            act.fcurves.new(rot_path, index=2, action_group=bname)
+            utils.version.new_action_fcurve(
+                act, loc_path, index=0, action_group=bname,
+                id_owner=bpy_armature),
+            utils.version.new_action_fcurve(
+                act, loc_path, index=1, action_group=bname,
+                id_owner=bpy_armature),
+            utils.version.new_action_fcurve(
+                act, loc_path, index=2, action_group=bname,
+                id_owner=bpy_armature),
+            utils.version.new_action_fcurve(
+                act, rot_path, index=0, action_group=bname,
+                id_owner=bpy_armature),
+            utils.version.new_action_fcurve(
+                act, rot_path, index=1, action_group=bname,
+                id_owner=bpy_armature),
+            utils.version.new_action_fcurve(
+                act, rot_path, index=2, action_group=bname,
+                id_owner=bpy_armature)
         ]
         xmat = bpy_bone.matrix_local.inverted()
         real_parent = utils.bone.find_bone_exportable_parent(bpy_bone)
@@ -313,8 +327,7 @@ def import_motion(
                     for axis in range(3):
                         frames[axis + 3].extend((time, rot[axis]))
             finally:
-                for fcurve in tmpfc:
-                    act.fcurves.remove(fcurve)
+                utils.version.remove_action_fcurves(act, tmpfc)
 
             # insert keyframes
             utils.action.insert_keyframes(frames, fcs)
