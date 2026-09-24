@@ -73,4 +73,4 @@ def register():
 
 
 def unregister():
-    bpy.utils.unregister_class(XRAY_OT_collaps)
+    utils.version.unregister_class(XRAY_OT_collaps)

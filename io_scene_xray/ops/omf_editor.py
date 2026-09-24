@@ -140,5 +140,4 @@ def register():
 
 
 def unregister():
-    for op_class in reversed(classes):
-        bpy.utils.unregister_class(op_class)
+    utils.version.unregister_classes(classes)

@@ -473,4 +473,4 @@ def register():
 
 
 def unregister():
-    bpy.utils.unregister_class(XRAY_OT_change_shader_params)
+    utils.version.unregister_class(XRAY_OT_change_shader_params)

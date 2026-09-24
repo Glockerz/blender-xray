@@ -6,6 +6,7 @@ import bpy
 
 # addon modules
 from .. import formats
+from .. import utils
 
 
 class BaseSelectMotionsOp(bpy.types.Operator):
@@ -84,10 +85,8 @@ classes = (
 
 
 def register():
-    for clas in classes:
-        bpy.utils.register_class(clas)
+    utils.version.register_classes(classes)
 
 
 def unregister():
-    for clas in reversed(classes):
-        bpy.utils.unregister_class(clas)
+    utils.version.unregister_classes(classes)

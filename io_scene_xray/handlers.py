@@ -58,10 +58,16 @@ def scene_update_post(_):
 
 
 def register():
-    bpy.app.handlers.load_post.append(load_post)
-    utils.version.get_scene_update_post().append(scene_update_post)
+    utils.version.append_handler(bpy.app.handlers.load_post, load_post)
+    utils.version.append_handler(
+        utils.version.get_scene_update_post(),
+        scene_update_post
+    )
 
 
 def unregister():
-    utils.version.get_scene_update_post().remove(scene_update_post)
-    bpy.app.handlers.load_post.remove(load_post)
+    utils.version.remove_handler(
+        utils.version.get_scene_update_post(),
+        scene_update_post
+    )
+    utils.version.remove_handler(bpy.app.handlers.load_post, load_post)

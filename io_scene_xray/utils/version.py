@@ -222,9 +222,63 @@ def _make_annotations(cls):
     return cls
 
 
+def is_registered(clas):
+    # registered Blender classes have the 'is_registered' attribute
+    return getattr(clas, 'is_registered', False)
+
+
+def _iter_subclasses(clas):
+    for subclas in clas.__subclasses__():
+        yield subclas
+        for subsubclas in _iter_subclasses(subclas):
+            yield subsubclas
+
+
+def get_registered_class(bl_idname):
+    # get the registered operator class by the bl_idname
+    if not bl_idname:
+        return None
+
+    for clas in _iter_subclasses(bpy.types.Operator):
+        if getattr(clas, 'bl_idname', None) != bl_idname:
+            continue
+        if is_registered(clas):
+            return clas
+
+    return None
+
+
+def is_bl_idname_registered(bl_idname):
+    return get_registered_class(bl_idname) is not None
+
+
 def _register_class(clas):
     _make_annotations(clas)
-    bpy.utils.register_class(clas)
+
+    # The class can be already registered, if the addon is registered
+    # again (for example, after a failed unregistration). Blender raises
+    # ValueError for such classes ('already registered as a subclass'),
+    # so they are skipped here.
+    if is_registered(clas):
+        return
+
+    try:
+        bpy.utils.register_class(clas)
+    except ValueError:
+        # Another class with the same bl_idname is already registered
+        # (for example, two copies of the addon are installed
+        # and both of them are enabled).
+        if not is_bl_idname_registered(getattr(clas, 'bl_idname', None)):
+            raise
+
+        print(
+            'XRay Engine Tools: "{}" is not registered, '
+            'the identifier "{}" is already used by another class. '
+            'Remove the duplicate copy of the addon.'.format(
+                clas.__name__, clas.bl_idname
+            )
+        )
+        return
 
     b_type = getattr(clas, 'b_type', None)
     if b_type:
@@ -239,21 +293,51 @@ def register_classes(operators):
         _register_class(operators)
 
 
+def unregister_class(clas):
+    # Blender raises RuntimeError for not registered classes
+    # ('missing bl_rna attribute'), so they are skipped here.
+    if is_registered(clas):
+        bpy.utils.unregister_class(clas)
+
+
+def unregister_classes(classes):
+    if hasattr(classes, '__iter__'):
+        for clas in reversed(tuple(classes)):
+            unregister_class(clas)
+    else:
+        unregister_class(classes)
+
+
 def _unregister_prop_group(clas):
     # clas inherits from bpy.types.PropertyGroup
     if hasattr(clas, 'b_type'):
-        del clas.b_type.xray
+        try:
+            del clas.b_type.xray
+        except AttributeError:
+            # the property is already removed
+            pass
 
-    bpy.utils.unregister_class(clas)
+    unregister_class(clas)
 
 
 def unregister_prop_groups(classes):
     if hasattr(classes, '__iter__'):
         # clas inherits from bpy.types.PropertyGroup
-        for clas in reversed(classes):
+        for clas in reversed(tuple(classes)):
             _unregister_prop_group(clas)
     else:
         _unregister_prop_group(classes)
+
+
+def append_handler(handlers, handler):
+    if handler not in handlers:
+        handlers.append(handler)
+
+
+def remove_handler(handlers, handler):
+    # list.remove raises ValueError, if the handler is not in the list
+    if handler in handlers:
+        handlers.remove(handler)
 
 
 IMAGE_NODES = ('TEX_IMAGE', 'TEX_ENVIRONMENT')

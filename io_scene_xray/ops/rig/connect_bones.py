@@ -336,8 +336,8 @@ class XRAY_OT_create_connected_bones(utils.ie.BaseOperator):
 
 
 def register():
-    bpy.utils.register_class(XRAY_OT_create_connected_bones)
+    utils.version.register_classes(XRAY_OT_create_connected_bones)
 
 
 def unregister():
-    bpy.utils.unregister_class(XRAY_OT_create_connected_bones)
+    utils.version.unregister_class(XRAY_OT_create_connected_bones)

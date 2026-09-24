@@ -4,6 +4,7 @@ import bpy
 # addon modules
 from .. import ui
 from .. import ops
+from .. import utils
 
 
 class XRAY_PT_shader(ui.base.XRayPanel):
@@ -30,8 +31,8 @@ class XRAY_PT_shader(ui.base.XRayPanel):
 
 
 def register():
-    bpy.utils.register_class(XRAY_PT_shader)
+    utils.version.register_classes(XRAY_PT_shader)
 
 
 def unregister():
-    bpy.utils.unregister_class(XRAY_PT_shader)
+    utils.version.unregister_class(XRAY_PT_shader)

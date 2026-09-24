@@ -698,7 +698,5 @@ def register():
 
 def unregister():
     if not utils.version.IS_28:
-        for operator in reversed(classes_27x):
-            bpy.utils.unregister_class(operator)
-    for operator in reversed(classes):
-        bpy.utils.unregister_class(operator)
+        utils.version.unregister_classes(classes_27x)
+    utils.version.unregister_classes(classes)

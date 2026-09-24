@@ -120,10 +120,8 @@ classes = (
 
 
 def register():
-    for operator in classes:
-        bpy.utils.register_class(operator)
+    utils.version.register_classes(classes)
 
 
 def unregister():
-    for operator in reversed(classes):
-        bpy.utils.unregister_class(operator)
+    utils.version.unregister_classes(classes)

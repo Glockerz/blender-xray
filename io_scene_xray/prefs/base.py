@@ -59,4 +59,4 @@ def register():
 
 
 def unregister():
-    bpy.utils.unregister_class(XRAY_addon_preferences)
+    utils.version.unregister_class(XRAY_addon_preferences)

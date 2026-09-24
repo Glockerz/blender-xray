@@ -158,8 +158,7 @@ classes = (
 
 
 def register():
-    for clas in classes:
-        bpy.utils.register_class(clas)
+    utils.version.register_classes(classes)
 
     append_menu_func()
 
@@ -169,5 +168,4 @@ def unregister():
 
     _remove_ops_from_menus(menu_imp, menu_exp)
 
-    for clas in reversed(classes):
-        bpy.utils.unregister_class(clas)
+    utils.version.unregister_classes(classes)

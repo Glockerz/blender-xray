@@ -12,6 +12,11 @@ ICON_EXT = 'png'
 
 
 def register():
+    if 'main' in utils.draw.preview_collections:
+        # the icons are already registered,
+        # do not create the preview collection twice
+        return
+
     # get icon file path
     ui_package_dir = os.path.dirname(__file__)
     icon_file = utils.draw.STALKER_ICON_NAME + os.extsep + ICON_EXT

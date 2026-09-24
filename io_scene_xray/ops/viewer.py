@@ -682,5 +682,4 @@ def register():
 
 def unregister():
     utils.version.unregister_prop_groups(prop_groups)
-    for operator in reversed(classes):
-        bpy.utils.unregister_class(operator)
+    utils.version.unregister_classes(classes)

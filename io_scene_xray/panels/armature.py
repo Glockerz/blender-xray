@@ -122,8 +122,8 @@ class XRAY_PT_armature(ui.base.XRayPanel):
 
 
 def register():
-    bpy.utils.register_class(XRAY_PT_armature)
+    utils.version.register_classes(XRAY_PT_armature)
 
 
 def unregister():
-    bpy.utils.unregister_class(XRAY_PT_armature)
+    utils.version.unregister_class(XRAY_PT_armature)

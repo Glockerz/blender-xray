@@ -873,5 +873,4 @@ def register():
 
 
 def unregister():
-    for clas in reversed(classes):
-        bpy.utils.unregister_class(clas)
+    utils.version.unregister_classes(classes)

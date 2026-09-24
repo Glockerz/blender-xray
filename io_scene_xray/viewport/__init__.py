@@ -116,41 +116,84 @@ def overlay_view_3d():
     utils.draw.reset_gl_state()
 
 
+# the handle of the viewport draw handler
+overlay_view_3d.__handle = None
+
+
 def register():
-    overlay_view_3d.__handle = bpy.types.SpaceView3D.draw_handler_add(
-        overlay_view_3d,
-        (),
-        'WINDOW',
-        'POST_VIEW'
-    )
+    if overlay_view_3d.__handle is None:
+        overlay_view_3d.__handle = bpy.types.SpaceView3D.draw_handler_add(
+            overlay_view_3d,
+            (),
+            'WINDOW',
+            'POST_VIEW'
+        )
     if utils.version.IS_281:
-        bpy.app.handlers.depsgraph_update_post.append(update_draw_ctx)
-        bpy.app.handlers.frame_change_post.append(update_draw_ctx)
-        bpy.app.handlers.load_post.append(clear_draw_ctx)
+        utils.version.append_handler(
+            bpy.app.handlers.depsgraph_update_post, update_draw_ctx
+        )
+        utils.version.append_handler(
+            bpy.app.handlers.frame_change_post, update_draw_ctx
+        )
+        utils.version.append_handler(
+            bpy.app.handlers.load_post, clear_draw_ctx
+        )
     elif utils.version.IS_28:
-        bpy.app.handlers.depsgraph_update_post.append(update_draw_ctx_27x)
-        bpy.app.handlers.frame_change_post.append(update_draw_ctx_27x)
-        bpy.app.handlers.load_post.append(clear_draw_ctx_27x)
+        utils.version.append_handler(
+            bpy.app.handlers.depsgraph_update_post, update_draw_ctx_27x
+        )
+        utils.version.append_handler(
+            bpy.app.handlers.frame_change_post, update_draw_ctx_27x
+        )
+        utils.version.append_handler(
+            bpy.app.handlers.load_post, clear_draw_ctx_27x
+        )
     else:
-        bpy.app.handlers.scene_update_post.append(update_draw_ctx_27x)
-        bpy.app.handlers.frame_change_post.append(update_draw_ctx_27x)
-        bpy.app.handlers.load_post.append(clear_draw_ctx_27x)
+        utils.version.append_handler(
+            bpy.app.handlers.scene_update_post, update_draw_ctx_27x
+        )
+        utils.version.append_handler(
+            bpy.app.handlers.frame_change_post, update_draw_ctx_27x
+        )
+        utils.version.append_handler(
+            bpy.app.handlers.load_post, clear_draw_ctx_27x
+        )
 
 
 def unregister():
     if utils.version.IS_281:
-        bpy.app.handlers.load_post.remove(clear_draw_ctx)
-        bpy.app.handlers.frame_change_post.remove(update_draw_ctx)
-        bpy.app.handlers.depsgraph_update_post.remove(update_draw_ctx)
+        utils.version.remove_handler(
+            bpy.app.handlers.load_post, clear_draw_ctx
+        )
+        utils.version.remove_handler(
+            bpy.app.handlers.frame_change_post, update_draw_ctx
+        )
+        utils.version.remove_handler(
+            bpy.app.handlers.depsgraph_update_post, update_draw_ctx
+        )
     elif utils.version.IS_28:
-        bpy.app.handlers.load_post.remove(clear_draw_ctx_27x)
-        bpy.app.handlers.frame_change_post.remove(update_draw_ctx_27x)
-        bpy.app.handlers.depsgraph_update_post.remove(update_draw_ctx_27x)
+        utils.version.remove_handler(
+            bpy.app.handlers.load_post, clear_draw_ctx_27x
+        )
+        utils.version.remove_handler(
+            bpy.app.handlers.frame_change_post, update_draw_ctx_27x
+        )
+        utils.version.remove_handler(
+            bpy.app.handlers.depsgraph_update_post, update_draw_ctx_27x
+        )
     else:
-        bpy.app.handlers.load_post.remove(clear_draw_ctx_27x)
-        bpy.app.handlers.frame_change_post.remove(update_draw_ctx_27x)
-        bpy.app.handlers.scene_update_post.remove(update_draw_ctx_27x)
-    bpy.types.SpaceView3D.draw_handler_remove(
-        overlay_view_3d.__handle,
-        'WINDOW'
-    )
+        utils.version.remove_handler(
+            bpy.app.handlers.load_post, clear_draw_ctx_27x
+        )
+        utils.version.remove_handler(
+            bpy.app.handlers.frame_change_post, update_draw_ctx_27x
+        )
+        utils.version.remove_handler(
+            bpy.app.handlers.scene_update_post, update_draw_ctx_27x
+        )
+    if overlay_view_3d.__handle is not None:
+        bpy.types.SpaceView3D.draw_handler_remove(
+            overlay_view_3d.__handle,
+            'WINDOW'
+        )
+        overlay_view_3d.__handle = None

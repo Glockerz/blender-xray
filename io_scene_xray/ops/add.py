@@ -107,4 +107,4 @@ def register():
 
 
 def unregister():
-    bpy.utils.unregister_class(XRAY_OT_add_camera)
+    utils.version.unregister_class(XRAY_OT_add_camera)

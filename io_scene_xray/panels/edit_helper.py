@@ -4,6 +4,7 @@ import bpy
 # addon modules
 from .. import ui
 from .. import ops
+from .. import utils
 
 
 class XRAY_PT_edit_helper(ui.base.XRayPanel):
@@ -20,8 +21,8 @@ class XRAY_PT_edit_helper(ui.base.XRayPanel):
 
 
 def register():
-    bpy.utils.register_class(XRAY_PT_edit_helper)
+    utils.version.register_classes(XRAY_PT_edit_helper)
 
 
 def unregister():
-    bpy.utils.unregister_class(XRAY_PT_edit_helper)
+    utils.version.unregister_class(XRAY_PT_edit_helper)

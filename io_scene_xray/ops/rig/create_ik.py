@@ -441,4 +441,4 @@ def register():
 
 
 def unregister():
-    bpy.utils.unregister_class(XRAY_OT_create_ik)
+    utils.version.unregister_class(XRAY_OT_create_ik)

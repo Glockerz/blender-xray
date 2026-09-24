@@ -89,8 +89,8 @@ class XRAY_OT_remove_rig(utils.ie.BaseOperator):
 
 
 def register():
-    bpy.utils.register_class(XRAY_OT_remove_rig)
+    utils.version.register_classes(XRAY_OT_remove_rig)
 
 
 def unregister():
-    bpy.utils.unregister_class(XRAY_OT_remove_rig)
+    utils.version.unregister_class(XRAY_OT_remove_rig)

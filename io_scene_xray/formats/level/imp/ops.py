@@ -90,4 +90,4 @@ def register():
 
 
 def unregister():
-    bpy.utils.unregister_class(XRAY_OT_import_level)
+    utils.version.unregister_class(XRAY_OT_import_level)

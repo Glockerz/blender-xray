@@ -132,8 +132,8 @@ def _get_active_helper(context):
 
 
 def register():
-    bpy.utils.register_class(XRAY_OT_edit_cancel)
+    utils.version.register_classes(XRAY_OT_edit_cancel)
 
 
 def unregister():
-    bpy.utils.unregister_class(XRAY_OT_edit_cancel)
+    utils.version.unregister_class(XRAY_OT_edit_cancel)

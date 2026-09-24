@@ -70,8 +70,8 @@ class XRAY_PT_mesh(ui.base.XRayPanel):
 
 
 def register():
-    bpy.utils.register_class(XRAY_PT_mesh)
+    utils.version.register_classes(XRAY_PT_mesh)
 
 
 def unregister():
-    bpy.utils.unregister_class(XRAY_PT_mesh)
+    utils.version.unregister_class(XRAY_PT_mesh)

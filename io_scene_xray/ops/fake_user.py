@@ -211,4 +211,4 @@ def register():
 
 
 def unregister():
-    bpy.utils.unregister_class(XRAY_OT_change_fake_user)
+    utils.version.unregister_class(XRAY_OT_change_fake_user)

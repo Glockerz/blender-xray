@@ -80,4 +80,4 @@ def register():
 
 
 def unregister():
-    bpy.utils.unregister_class(XRAY_OT_list)
+    utils.version.unregister_class(XRAY_OT_list)

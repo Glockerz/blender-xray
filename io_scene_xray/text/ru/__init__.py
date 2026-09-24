@@ -20,4 +20,8 @@ def register():
 
 
 def unregister():
-    bpy.app.translations.unregister('io_scene_xray')
+    try:
+        bpy.app.translations.unregister('io_scene_xray')
+    except RuntimeError:
+        # the translations are already unregistered
+        pass

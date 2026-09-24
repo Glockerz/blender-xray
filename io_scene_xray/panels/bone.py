@@ -382,8 +382,8 @@ class XRAY_PT_bone(ui.base.XRayPanel):
 
 
 def register():
-    bpy.utils.register_class(XRAY_PT_bone)
+    utils.version.register_classes(XRAY_PT_bone)
 
 
 def unregister():
-    bpy.utils.unregister_class(XRAY_PT_bone)
+    utils.version.unregister_class(XRAY_PT_bone)
